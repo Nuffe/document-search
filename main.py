@@ -1,7 +1,8 @@
 import os
 import string
 import pathlib
-
+import math
+from rank_bm25 import BM25Okapi
 
 folder = "test-files"
 
@@ -11,8 +12,9 @@ wordDict = {}
 fileDict = {}
 
 
-def add_to_dict(word_list, file):
 
+
+def add_to_dict(word_list, file):
                         
     for word in word_list:
         word = word.lower()
@@ -57,23 +59,55 @@ with os.scandir(folder) as files:
 k = 1.2
 b = 0.75
 #Term Frequency (TF)
+BM_Scores = {}
 for file in wordDict[search_word_user]:   
     print("file loop: ", file)
+
     TF = wordDict[search_word_user][file]
     print("Term frequency:", TF)
 
     print("Length of document: ", fileDict[file])
     d = fileDict[file]
+
+    documentAmount = len(fileDict)
+    print("amount of documents in search", documentAmount)
+
     print("amount of documents with file: ", len(wordDict[search_word_user]))
-    avgdl = len(wordDict[search_word_user])
+    NQ = len(wordDict[search_word_user])
+
+    IDF = math.log(((documentAmount-NQ+0.5)/(NQ+0.5))+1)
+    print("IDF POINT: ", IDF)
+
+    length_sum = 0
+    for file2 in fileDict:
+        length_sum += fileDict[file2]
+
+    avgdl = length_sum / documentAmount
+    print("avgdl: ", avgdl)
+
+    score = (TF * (k + 1)) / (TF + k * (1 - b + b * (d / avgdl)))
+    print(f"BM25 score: {score} * {IDF}: ", score * IDF)
+    BM_Scores[file] = score * IDF
 
 
-  #  avgdl = (d / len[wordDict[search_word_user]])
-    score = (TF / (TF + k * (1-b+b*(d/avgdl ))))
-    print("SCORE: ", score)
+BM_list = []
+with os.scandir(folder) as files:
+    for file in files:
+        if file.is_file() and file.name.endswith(".txt"):
+            with open(file.path, "r") as openFile:
+                corpus = openFile.read()
+                corpus = corpus.replace("_", " ").replace("-", " ") \
+                        .translate(str.maketrans('', '', string.punctuation)).lower().split()
+                BM_list.append(corpus)
 
+print("BM LIST:", BM_list)
+bm25 = BM25Okapi(BM_list)
 
-print(f"Searched word: {search_word_user}")
-print("Files:")
-for file in wordDict.get(search_word_user, {}):
-    print(f"{file}, {search_word_user} appears {wordDict[search_word_user][file]}/{fileDict[file]} words")
+query = "hello"
+tokenized_query = query.split(" ")
+doc_scores = bm25.get_scores(tokenized_query)
+print("BM25 LIB scores", doc_scores)
+
+for file in BM_Scores:
+    print(f"{file} BM SCORE: ", BM_Scores[file])
+
