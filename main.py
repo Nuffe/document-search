@@ -11,8 +11,18 @@ search_word_user = input().lower()
 wordDict = {}
 fileDict = {}
 
+# TO DO:
+# Add so the folder is a variable not hardcoded
 
 
+def load_index():
+    print("LOADING INDEX...")
+    # if file dont exist run save_index
+    # otherwise load it and set variabls right
+
+def save_index():
+    print("SAVING INDEX")
+    # Runs reverse_index and saves to Json
 
 def add_to_dict(word_list, file):    
     for word in word_list:
