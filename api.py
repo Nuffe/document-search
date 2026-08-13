@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel  
 
 app = FastAPI()
 
@@ -17,6 +18,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+class Item(BaseModel):
+    name: str
+    description: str | None = None
+
 @app.get("/")
-def connect_test():
-    return {"message": " Hello from document search"}
+def connect_test(text: str, age):
+    return {"message": f"Hello from document search with {text, age}"}
+
+@app.post("/request")
+def test_post(item : Item):
+    print(item, "recived")
+    return {"message": "Message recived"}
