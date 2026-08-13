@@ -6,16 +6,12 @@ from rank_bm25 import BM25Okapi
 import json
 import hashlib
 
-wordDict = {}
-index = {}
-index["files"] = {}
+
+
 
 # TO DO:
 # Add so the folder is a variable not hardcoded
-# Load, must check if new files have been added, 
-        # Variable of loaded files? to know when more then previously saved are present?
-        # Json having a list of files within the index?
-        # Save to check if files already have index (hash), append to JSON and only run on new files?
+
 # 5, make work with multiple file types
 # 6, look into multiple search words
 
@@ -55,7 +51,6 @@ def get_index(folder):
 def reverse_index(file, index, wordDict):
     if file.is_file() and file.name.endswith(".txt"): # To do 5
         with open(file.path, "r") as openFile:  
-
             # Add the files name to the index
             file_name = pathlib.Path(file.name).stem
             file_name_list = file_name.replace("_", " ").replace("-", " ") \
@@ -123,11 +118,11 @@ def call_rank_bm25():
 
 def run():
     index = get_index("test-files")
-    print("index \n __________\n",json.dumps(index, indent=4, sort_keys=True), "\n _____________")
+    #print("index \n __________\n",json.dumps(index, indent=4, sort_keys=True), "\n _____________")
 
     while(True):
         print("Input word to search: ")
-        user_input = input()
+        user_input = input().lower()
         if user_input == "":
             "no input breaking"
             break
