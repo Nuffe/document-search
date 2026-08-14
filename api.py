@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel  
 
@@ -30,3 +30,8 @@ def connect_test(text: str, age):
 def test_post(item : Item):
     print(item, "recived")
     return {"message": "Message recived"}
+
+@app.post("/uploadfile")
+def create_upload_file(file: UploadFile):
+    print("file recived: ", file)
+    return {"file recived" : file.filename}
