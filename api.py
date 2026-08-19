@@ -7,7 +7,8 @@ app = FastAPI()
 origins = [
     "http://localhost",
     "http://localhost:8080",
-    "http://localhost:7000"
+    "http://localhost:7000",
+    "http://localhost:7000/filesearch"
 ]
 
 app.add_middleware(
@@ -32,6 +33,9 @@ def test_post(item : Item):
     return {"message": "Message recived"}
 
 @app.post("/uploadfile")
-def create_upload_file(file: UploadFile):
-    print("file recived: ", file)
-    return {"file recived" : file.filename}
+def create_upload_file(files: list[UploadFile]):
+    filenames = []
+    for file in files:
+        filenames.append(file.filename)
+    print("FILES: ", filenames)
+    return {"file recived" : filenames}
